@@ -2,29 +2,42 @@
 
 ## 1. System Design
 
-**a. Initial design**
+### a. Initial design
 
-- Briefly describe your initial UML design.
-- What classes did you include, and what responsibilities did you assign to each?
-
-My initial UML design for PawPal+ focuses on creating a simple and organized pet care management system using Object-Oriented Programming (OOP). The goal is to help pet owners manage their pets' daily activities, such as feeding, walking, medication, and appointments.
+My initial UML design for PawPal+ focuses on building a simple pet care management system using Object-Oriented Programming (OOP). The goal is to help pet owners organize daily activities such as feeding, walking, medication, and appointments for multiple pets.
 
 I included four main classes:
 
-1. Owner: Stores the owner's information and manages multiple pets. It allows the owner to add pets and access all their scheduled tasks.
-2. Pet: Stores information about each pet, such as its name and species, along with its list of tasks. It allows tasks to be added and viewed.
-3. Task: Represents an individual activity, including its description, scheduled time, frequency, and completion status. It includes a method to mark a task as completed.
-4. Scheduler: Organizes tasks across all pets. It handles sorting tasks by time, filtering tasks, identifying scheduling conflicts, and managing recurring activities.
+1. **Owner:** Stores the owner's information and manages multiple pets. It includes methods to add, remove, and find pets, as well as retrieve all their scheduled tasks.
+2. **Pet:** Stores information about each pet, such as its name, species, age, and list of tasks. It allows tasks to be added, removed, and viewed.
+3. **Task:** Represents an individual pet care activity. It stores the description, scheduled time, frequency, associated pet, and completion status. It includes methods to mark tasks as completed and calculate the next occurrence of recurring tasks.
+4. **Scheduler:** Organizes tasks across multiple pets. It handles sorting tasks by time, filtering tasks by pet or completion status, detecting scheduling conflicts, and managing recurring activities.
 
-The relationships are straightforward: **one Owner can have multiple Pets, each Pet can have multiple Tasks, and the Scheduler manages tasks across all Pets.**
+In my UML diagram, one Owner can have multiple Pets, each Pet can have multiple Tasks, and the Scheduler accesses the Owner to manage tasks across all pets.
 
-I chose this design because it separates responsibilities between classes, making the code easier to understand, test, maintain, and extend as new features are added.
+I chose this design because each class has a specific responsibility. This makes the code easier to understand, test, maintain, and extend as new features are added.
 
+### b. Design changes
 
-**b. Design changes**
+After creating my initial UML diagram and Python class skeleton, I asked Claude to review the design for missing relationships, unnecessary dependencies, and potential logic issues.
 
-- Did your design change during implementation?
-- If yes, describe at least one change and why you made it.
+Claude confirmed that the four classes had clear responsibilities and that their relationships were appropriate. However, it also suggested a few improvements to make the application more reliable.
+
+One suggestion I accepted was to have `Scheduler.get_all_tasks()` call `Owner.get_all_tasks()` instead of repeating the same logic. This avoids code duplication and keeps task retrieval in one place.
+
+I also agreed with the suggestion to have `Pet.add_task()` automatically update `task.pet_name` to match the pet's name. This will help prevent inconsistencies between tasks and their associated pets.
+
+For conflict detection, Claude recommended checking whether two tasks have the exact same scheduled time instead of implementing more complicated overlapping-time calculations. I chose this simpler approach because it is sufficient for the initial project and easier to understand and test.
+
+Another useful suggestion was to use `dataclasses.replace()` when generating recurring tasks. This will allow the application to create a new task without modifying the original completed task.
+
+I decided not to add advanced features such as task durations or complex scheduling optimization at this stage because they would introduce unnecessary complexity.
+
+One change I made to my UML diagram was updating the relationships to use `0..*`, showing that an Owner can have zero or more Pets and each Pet can have zero or more Tasks.
+
+After reviewing these suggestions, I asked Claude to compare my UML diagram with the Python class skeleton. Claude confirmed that the classes, attributes, methods, and relationships were consistent. Since the planned improvements only affect method implementations, I decided to keep the overall class structure unchanged.
+
+This process helped me understand the importance of reviewing AI-generated suggestions rather than accepting everything automatically. I learned that a good system design should balance functionality, simplicity, and maintainability. I plan to implement the accepted improvements during the next development phases.
 
 ---
 
