@@ -4,7 +4,8 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field, replace
 from datetime import datetime, timedelta
-from typing import List, Optional
+from itertools import combinations
+from typing import Dict, List, Optional, Tuple
 
 VALID_FREQUENCIES = ("once", "daily", "weekly")
 
@@ -129,10 +130,31 @@ class Scheduler:
         """Return tasks across all pets matching the given completion status."""
         return [task for task in self.get_all_tasks() if task.completed == completed]
 
-    def find_conflicts(self) -> list:
-        """Return groups of tasks that conflict in time."""
-        pass
+    def find_conflicts(self) -> List[Tuple[Task, Task]]:
+        """Return every unique pair of pending tasks that share the exact same due_time."""
+        by_time: Dict[datetime, List[Task]] = {}
+        for task in self.get_all_tasks():
+            if not task.completed:
+                by_time.setdefault(task.due_time, []).append(task)
+        conflicts: List[Tuple[Task, Task]] = []
+        for group in by_time.values():
+            conflicts.extend(combinations(group, 2))
+        return conflicts
 
     def complete_task(self, task: Task) -> None:
-        """Mark a task complete and schedule its next occurrence if recurring."""
-        pass
+        """Complete a task this owner's pet holds and add its next daily/weekly occurrence.
+
+        Raises ValueError if the task isn't owned by this scheduler's owner.
+        Completing an already-completed task does nothing, so it never adds a duplicate.
+        """
+        owning_pet = next(
+            (pet for pet in self.owner.pets if any(t is task for t in pet.tasks)), None
+        )
+        if owning_pet is None:
+            raise ValueError(f"Task {task.description!r} does not belong to {self.owner.name!r}")
+        if task.completed:
+            return
+        task.mark_complete()
+        next_task = task.next_occurrence()
+        if next_task is not None:
+            owning_pet.add_task(next_task)

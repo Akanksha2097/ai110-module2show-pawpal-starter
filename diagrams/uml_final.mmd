@@ -1,0 +1,55 @@
+classDiagram
+    %% Final design: matches pawpal_system.py as implemented.
+    %% Differences from uml_draft.mmd are marked "changed" or "added".
+
+    class Owner {
+        +str name
+        +list~Pet~ pets
+        +__init__(name, pets) added
+        +add_pet(pet) raises ValueError on duplicate name
+        +remove_pet(pet_name) raises ValueError if missing
+        +get_pet(pet_name) Optional~Pet~ changed
+        +get_all_tasks() list~Task~
+    }
+
+    class Pet {
+        <<dataclass>>
+        +str name
+        +str species
+        +int age
+        +list~Task~ tasks
+        +add_task(task) syncs task.pet_name
+        +remove_task(task) raises ValueError if missing
+        +get_pending_tasks() list~Task~
+    }
+
+    class Task {
+        <<dataclass>>
+        +str description
+        +datetime due_time
+        +str frequency
+        +str pet_name
+        +bool completed
+        +__post_init__() added
+        +mark_complete()
+        +next_occurrence() Optional~Task~ changed
+    }
+
+    class Scheduler {
+        +Owner owner
+        +__init__(owner) added
+        +get_all_tasks() list~Task~
+        +sort_by_time(tasks) list~Task~
+        +filter_by_pet(pet_name) list~Task~
+        +filter_by_status(completed) list~Task~
+        +find_conflicts() list~tuple~
+        +complete_task(task) raises ValueError if not owned
+    }
+
+    %% find_conflicts returns a list of (Task, Task) pairs: pending tasks with the same due_time.
+    %% next_occurrence returns None for "once" tasks. frequency is one of: once, daily, weekly.
+
+    Owner "1" *-- "0..*" Pet : has
+    Pet "1" *-- "0..*" Task : has
+    Scheduler "1" --> "1" Owner : reads tasks via
+    Scheduler ..> Task : sorts, filters, pairs, completes
