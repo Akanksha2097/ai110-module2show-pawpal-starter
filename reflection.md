@@ -7,6 +7,20 @@
 - Briefly describe your initial UML design.
 - What classes did you include, and what responsibilities did you assign to each?
 
+My initial UML design for PawPal+ focuses on creating a simple and organized pet care management system using Object-Oriented Programming (OOP). The goal is to help pet owners manage their pets' daily activities, such as feeding, walking, medication, and appointments.
+
+I included four main classes:
+
+1. Owner: Stores the owner's information and manages multiple pets. It allows the owner to add pets and access all their scheduled tasks.
+2. Pet: Stores information about each pet, such as its name and species, along with its list of tasks. It allows tasks to be added and viewed.
+3. Task: Represents an individual activity, including its description, scheduled time, frequency, and completion status. It includes a method to mark a task as completed.
+4. Scheduler: Organizes tasks across all pets. It handles sorting tasks by time, filtering tasks, identifying scheduling conflicts, and managing recurring activities.
+
+The relationships are straightforward: **one Owner can have multiple Pets, each Pet can have multiple Tasks, and the Scheduler manages tasks across all Pets.**
+
+I chose this design because it separates responsibilities between classes, making the code easier to understand, test, maintain, and extend as new features are added.
+
+
 **b. Design changes**
 
 - Did your design change during implementation?
